@@ -110,7 +110,7 @@
       presenter=true;stopListening();
       paint('<div class="card" style="max-width:500px;margin:auto"><div class="eyebrow">Presenter only</div><h2>Masuk ke Presenter Mode</h2><p>Gunakan akun presenter Supabase Auth. Peserta tidak perlu email atau password.</p>'+
         '<form id="loginForm"><label>Email</label><input id="loginEmail" type="email" required autocomplete="username" /><label>Password</label><input id="loginPassword" type="password" minlength="6" required autocomplete="current-password" />'+
-        '<button class="button primary block" type="submit">Masuk</button></form><div class="actions">'+button("Daftar presenter","lab.presenterSignup()")+button("Kembali","lab.home()")+'</div><div id="feedback"></div></div>');
+        '<button class="button primary block" type="submit">Masuk</button></form><div class="actions">'+button("Lupa password","lab.resetPassword()")+button("Daftar presenter","lab.presenterSignup()")+button("Kembali","lab.home()")+'</div><div id="feedback"></div></div>');
       document.getElementById("loginForm").onsubmit=async(ev)=>{ev.preventDefault();const {data,error}=await db.auth.signInWithPassword({email:document.getElementById("loginEmail").value,password:document.getElementById("loginPassword").value});if(error){notify(errorText(error),true);return}currentUser=data.user;presenterDashboard()};
     }
     function presenterSignup(){
@@ -165,6 +165,58 @@
         notify("Permintaan pengiriman ulang berhasil. Periksa Inbox/Spam email Anda. Gunakan tautan verifikasi terbaru.");
       }catch(e){notify("Tidak dapat mengirim ulang: "+errorText(e),true)}
       finally{busy=false}
+    }
+    function resetPassword(){
+      presenter=true;
+      stopListening();
+      paint('<div class="card" style="max-width:500px;margin:auto"><div class="eyebrow">Pemulihan akun presenter</div><h2>Lupa password?</h2>'+
+        '<p>Masukkan email yang sudah terdaftar. Kami akan mengirim tautan untuk membuat password baru.</p>'+
+        '<form id="resetForm"><label>Email presenter</label><input id="resetEmail" type="email" autocomplete="email" required />'+
+        '<button id="resetButton" type="submit" class="button primary block">Kirim tautan reset password</button></form>'+
+        '<div class="actions">'+button("Kembali ke login","lab.presenterLogin()")+'</div><div id="feedback"></div></div>');
+      document.getElementById("resetForm").onsubmit=async(ev)=>{
+        ev.preventDefault();
+        if(busy)return;
+        busy=true;
+        const el=document.getElementById("resetButton");
+        el.disabled=true;el.textContent="Mengirim permintaan…";
+        try {
+          const email=document.getElementById("resetEmail").value.trim();
+          const redirect=location.origin+location.pathname+"?recover=1";
+          const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:redirect});
+          if(error)throw error;
+          notify("Jika alamat terdaftar dan pengiriman email tersedia, tautan reset akan dikirim. Periksa Inbox dan Spam.");
+        }catch(e){notify("Permintaan gagal: "+errorText(e),true)}
+        finally{busy=false;el.disabled=false;el.textContent="Kirim tautan reset password";}
+      };
+    }
+    function showNewPasswordForm(){
+      presenter=true;
+      stopListening();
+      paint('<div class="card" style="max-width:500px;margin:auto"><div class="eyebrow">Pemulihan akun presenter</div>'+
+        '<h2>Buat password baru</h2><p>Masukkan password baru untuk akun presenter.</p>'+
+        '<form id="newPasswordForm"><label>Password baru (minimal 8 karakter)</label>'+
+        '<input id="newPassword" type="password" minlength="8" autocomplete="new-password" required />'+
+        '<label>Ulangi password</label><input id="newPasswordConfirm" type="password" minlength="8" autocomplete="new-password" required />'+
+        '<button id="newPasswordButton" type="submit" class="button primary block">Simpan password baru</button></form>'+
+        '<div id="feedback"></div></div>');
+      document.getElementById("newPasswordForm").onsubmit=async(ev)=>{
+        ev.preventDefault();
+        if(busy)return;
+        const pass=document.getElementById("newPassword").value;
+        if(pass!==document.getElementById("newPasswordConfirm").value){notify("Konfirmasi password tidak sama.",true);return}
+        busy=true;
+        const el=document.getElementById("newPasswordButton");el.disabled=true;
+        try{
+          const {error}=await db.auth.updateUser({password:pass});
+          if(error)throw error;
+          history.replaceState(null,"",location.pathname);
+          await db.auth.signOut();
+          presenterLogin();
+          notify("Password diperbarui. Silakan login menggunakan password baru.");
+        }catch(e){notify(errorText(e),true)}
+        finally{busy=false;el.disabled=false}
+      };
     }
     async function presenterDashboard(){
       presenter=true;
@@ -348,9 +400,18 @@
       const a=document.createElement("a");a.href=u;a.download="ai-governance-live-lab-"+(room?.code||"session")+".csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);
     }
     async function logout(){await db.auth.signOut();currentUser=null;room=null;home()}
-    window.lab={home,presenterLogin,presenterSignup,resendPresenterConfirmation,presenterDashboard,createRoom,openRoom,activate,reveal,endRoom,submit,exportCSV,logout};
+    window.lab={home,presenterLogin,presenterSignup,resendPresenterConfirmation,resetPassword,showNewPasswordForm,presenterDashboard,createRoom,openRoom,activate,reveal,endRoom,submit,exportCSV,logout};
     const {data:userData}=await db.auth.getUser();currentUser=userData?.user||null;
-    home();
+    const params=new URLSearchParams(location.search);
+    if(params.get("recover")==="1"){
+      const {data:sessionResult}=await db.auth.getSession();
+      if(sessionResult?.session){
+        showNewPasswordForm();
+      } else {
+        resetPassword();
+        notify("Tautan pemulihan tidak berlaku atau sudah kedaluwarsa. Minta tautan baru.",true);
+      }
+    }else home();
   </script>
 </body>
 </html>
