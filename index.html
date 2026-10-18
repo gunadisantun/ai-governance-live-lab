@@ -114,8 +114,57 @@
       document.getElementById("loginForm").onsubmit=async(ev)=>{ev.preventDefault();const {data,error}=await db.auth.signInWithPassword({email:document.getElementById("loginEmail").value,password:document.getElementById("loginPassword").value});if(error){notify(errorText(error),true);return}currentUser=data.user;presenterDashboard()};
     }
     function presenterSignup(){
-      paint('<div class="card" style="max-width:500px;margin:auto"><h2>Buat akun presenter</h2><p>Daftar menggunakan email. Anda mungkin perlu memverifikasi email sebelum masuk.</p><form id="signupForm"><label>Email</label><input id="signupEmail" type="email" required /><label>Password (minimal 8 karakter)</label><input id="signupPass" type="password" minlength="8" required /><button class="button primary block" type="submit">Daftar</button></form><div class="actions">'+button("Kembali ke login","lab.presenterLogin()")+'</div><div id="feedback"></div></div>');
-      document.getElementById("signupForm").onsubmit=async(ev)=>{ev.preventDefault();const {data,error}=await db.auth.signUp({email:document.getElementById("signupEmail").value,password:document.getElementById("signupPass").value});if(error){notify(errorText(error),true);return}currentUser=data.user;notify("Pendaftaran diterima. Periksa email verifikasi jika diminta, kemudian masuk sebagai presenter.")};
+      presenter=true;
+      paint('<div class="card" style="max-width:500px;margin:auto"><div class="eyebrow">Presenter only</div><h2>Buat akun presenter</h2>'+
+        '<p>Daftar satu kali menggunakan email Anda, lalu lakukan verifikasi sebelum login.</p>'+
+        '<form id="signupForm"><label>Email</label><input id="signupEmail" type="email" required autocomplete="email" />'+
+        '<label>Password (minimal 8 karakter)</label><input id="signupPass" type="password" minlength="8" required autocomplete="new-password" />'+
+        '<button id="signupSubmit" class="button primary block" type="submit">Daftar</button></form>'+
+        '<div class="actions">'+button("Kirim ulang email verifikasi","lab.resendPresenterConfirmation()")+button("Kembali ke login","lab.presenterLogin()")+'</div>'+
+        '<p class="small">Sudah pernah mendaftar? Jangan daftar dua kali. Gunakan kirim ulang verifikasi bila belum menerima email.</p><div id="feedback"></div></div>');
+      document.getElementById("signupForm").onsubmit=async(ev)=>{
+        ev.preventDefault();
+        if(busy)return;
+        busy=true;
+        const submit=document.getElementById("signupSubmit");
+        submit.disabled=true;
+        submit.textContent="Memproses pendaftaran…";
+        const email=document.getElementById("signupEmail").value.trim();
+        const password=document.getElementById("signupPass").value;
+        try{
+          const {data,error}=await db.auth.signUp({
+            email,
+            password,
+            options:{emailRedirectTo:location.origin}
+          });
+          if(error){
+            const message=String(error.message||"").toLowerCase();
+            if(message.includes("database error saving new user")||message.includes("already registered")){
+              notify("Email mungkin sudah terdaftar. Periksa email konfirmasi atau klik Kirim ulang email verifikasi. Jangan daftar kembali.",true);
+            }else notify(errorText(error),true);
+            return;
+          }
+          currentUser=data.user;
+          notify("Pendaftaran diterima. Periksa Inbox/Spam dan verifikasi email, lalu kembali ke halaman login.");
+        }catch(e){notify(errorText(e),true)}
+        finally{busy=false;submit.disabled=false;submit.textContent="Daftar"}
+      };
+    }
+    async function resendPresenterConfirmation(){
+      if(busy)return;
+      let email=document.getElementById("signupEmail")?.value?.trim();
+      if(!email){notify("Masukkan alamat email yang sudah didaftarkan terlebih dahulu.",true);return}
+      busy=true;
+      try{
+        const {error}=await db.auth.resend({
+          type:"signup",
+          email,
+          options:{emailRedirectTo:location.origin}
+        });
+        if(error)throw error;
+        notify("Permintaan pengiriman ulang berhasil. Periksa Inbox/Spam email Anda. Gunakan tautan verifikasi terbaru.");
+      }catch(e){notify("Tidak dapat mengirim ulang: "+errorText(e),true)}
+      finally{busy=false}
     }
     async function presenterDashboard(){
       presenter=true;
@@ -299,7 +348,7 @@
       const a=document.createElement("a");a.href=u;a.download="ai-governance-live-lab-"+(room?.code||"session")+".csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);
     }
     async function logout(){await db.auth.signOut();currentUser=null;room=null;home()}
-    window.lab={home,presenterLogin,presenterSignup,presenterDashboard,createRoom,openRoom,activate,reveal,endRoom,submit,exportCSV,logout};
+    window.lab={home,presenterLogin,presenterSignup,resendPresenterConfirmation,presenterDashboard,createRoom,openRoom,activate,reveal,endRoom,submit,exportCSV,logout};
     const {data:userData}=await db.auth.getUser();currentUser=userData?.user||null;
     home();
   </script>
