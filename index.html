@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#101827" />
+  <title>AI Governance Live Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{font-family:Poppins,system-ui,sans-serif;color:#182235;background:#f6f7fa;font-synthesis:none}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh}
+    button,input{font:inherit}
+    button{cursor:pointer;transition:transform .12s,background .15s}
+    button:active{transform:scale(.99)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    .wrap{max-width:1080px;margin:0 auto;padding:24px 18px 70px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:4px 0 24px;border-bottom:1px solid #e4e8ef;margin-bottom:30px}
+    .logo{font-size:17px;letter-spacing:-.6px;font-weight:700}
+    .logo b{color:#315cc9}
+    .brand-sig{font-size:11px;color:#748092}
+    h1{font-size:clamp(26px,4vw,42px);line-height:1.2;letter-spacing:-1.1px;margin:0 0 10px}
+    h2{font-size:20px;margin:0 0 16px;letter-spacing:-.5px}
+    h3{font-size:16px;margin:0 0 9px}
+    p{margin:8px 0 16px;color:#576274;line-height:1.65}
+    .muted,.small{color:#68778b}.small{font-size:12px}
+    .eyebrow{font-size:11px;font-weight:700;color:#5371ae;letter-spacing:1.7px;text-transform:uppercase;margin-bottom:12px}
+    .hero{padding:30px 0 24px}
+    .hero p{max-width:680px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .card{background:white;border:1px solid #e3e8ef;border-radius:15px;padding:24px;box-shadow:0 5px 20px rgba(24,34,53,.035)}
+    .panel{background:#f4f6fa;border-radius:10px;padding:16px}
+    .button{border:1px solid #d7deeb;background:#fff;color:#243450;padding:12px 17px;border-radius:8px;font-weight:600;display:inline-flex;justify-content:center;align-items:center;gap:8px}
+    .button.primary{background:#234ea4;color:white;border-color:#234ea4}
+    .button.dark{background:#172337;color:white;border-color:#172337}
+    .button.warn{background:#e8ecef;color:#374151}
+    .button:hover:not(:disabled){filter:brightness(.97)}
+    .button.block{display:flex;width:100%;margin-top:10px}
+    .actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+    input{border:1px solid #d0d8e5;border-radius:8px;background:#fff;padding:12px 14px;width:100%;outline:none}
+    input:focus{border-color:#4779dc;box-shadow:0 0 0 3px rgba(63,105,213,.13)}
+    label{font-size:12px;font-weight:600;display:block;margin:12px 0 7px}
+    .meta{font-size:12px;color:#768398}
+    .pill{display:inline-flex;border-radius:30px;padding:5px 10px;font-size:11px;font-weight:600;background:#eaf0fb;color:#345a9f}
+    .pill.green{background:#e3f5eb;color:#2b7452}.pill.red{background:#fce9e7;color:#b34543}
+    .toprow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .bigcode{font-size:clamp(32px,6vw,64px);letter-spacing:8px;font-weight:700;color:#20344e;margin:4px 0 0}
+    .questions{display:flex;flex-direction:column;gap:9px;margin:16px 0}
+    .question-row{padding:13px;border:1px solid #e0e6ee;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .option{display:flex;width:100%;text-align:left;padding:15px;border:1px solid #d5deeb;border-radius:9px;background:white;color:#253550;margin-top:10px;font-weight:500}
+    .option:hover{border-color:#4e78c5;background:#f1f5ff}
+    .result-row{margin:13px 0}
+    .bar-bg{height:12px;background:#ecf0f5;border-radius:6px;overflow:hidden;margin-top:6px}
+    .bar{height:100%;border-radius:6px;background:#3a63b6}
+    .barlabel{display:flex;justify-content:space-between;gap:10px;font-size:12px}
+    .notice{padding:14px 17px;border-radius:9px;background:#eef3fb;color:#2e548d;margin:15px 0;font-size:13px;line-height:1.6}
+    .notice.error{background:#fff0ee;color:#9e3131}
+    .empty{text-align:center;padding:32px 12px;color:#66778c}
+    .section-gap{margin-top:23px}
+    #qr{display:flex;justify-content:center;align-items:center;background:#fff;padding:8px;min-width:132px;min-height:132px}
+    .join-banner{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+    .number{font-size:34px;font-weight:700;letter-spacing:-1px}
+    .mini-stats{display:flex;gap:22px;flex-wrap:wrap}
+    .mini-stats div{min-width:92px}
+    table{border-collapse:collapse;width:100%;font-size:12px}
+    td,th{text-align:left;padding:9px;border-bottom:1px solid #e7ebf1}
+    footer{margin-top:45px;padding-top:20px;border-top:1px solid #e1e6ee;font-size:11px;color:#8792a1;text-align:center}
+    @media(max-width:680px){.grid,.cols{grid-template-columns:1fr}.wrap{padding:15px 13px 42px}.card{padding:18px}header{padding-bottom:18px;margin-bottom:16px}.bigcode{letter-spacing:4px}.button{min-height:44px}.question-row{align-items:flex-start;flex-direction:column}}
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+</head>
+<body>
+  <div class="wrap">
+    <header><div class="logo">AI GOVERNANCE <b>LIVE LAB</b></div><span class="brand-sig">Santun Gunadi</span></header>
+    <main id="app"><div class="empty">Memuat aplikasi…</div></main>
+    <footer>AI Governance Live Lab · Santun Gunadi · Seluruh kasus bersifat sintetis dan untuk pelatihan.</footer>
+  </div>
+  <script type="module">
+    import {createClient} from "https://esm.sh/@supabase/supabase-js@2.57.0";
+    const SUPABASE_URL = "https://bxfmocbpeqsepltixbce.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_0Kws7hgd0q3iNhLvyC3VmA_PjLEWLJa";
+    const db=createClient(SUPABASE_URL,SUPABASE_KEY);
+    const app=document.getElementById("app");
+    let currentUser=null, room=null, items=[], answerKeys=[], participants=[], responses=[], choiceSubmitted=null;
+    let presenter=false, channel=null, heartbeat=null, busy=false;
+    const demo=[
+      {type:"poll",title:"Live Poll · Kebijakan GenAI",prompt:"Bagaimana bank sebaiknya mengatur penggunaan GenAI publik untuk pekerjaan?",options:["Diizinkan tanpa pembatasan","Diizinkan untuk seluruh data","Diizinkan terbatas dengan kontrol","Dilarang dalam semua keadaan"]},
+      {type:"quiz",title:"AI Governance Challenge",prompt:"Pengendalian mana yang paling relevan untuk AI dengan dampak tinggi terhadap nasabah?",options:["Menghapus dokumentasi keputusan","Pengawasan manusia dan pengujian model","Mengabaikan pemantauan setelah go-live","Membiarkan vendor memutuskan sendiri"],correct:1,explanation:"AI berisiko tinggi perlu pengawasan manusia, validasi, dokumentasi dan pemantauan berkelanjutan."},
+      {type:"decision",title:"AI Governance Decision Room",prompt:"Vendor AI credit scoring siap go-live, tetapi belum ada evaluasi bias dan validasi independen. Apa keputusan Anda?",options:["Langsung go-live","Tunda hingga validasi dan kontrol dilakukan","Delegasikan seluruh keputusan kepada vendor","Hilangkan human oversight"],correct:1,explanation:"Penerapan perlu dasar penilaian risiko, pengujian bias, akuntabilitas, dan mekanisme pengawasan sebelum operasional."},
+      {type:"crisis",title:"AI Incident Crisis Room",prompt:"Seorang pegawai memasukkan dokumen yang memuat data nasabah ke layanan GenAI publik tanpa persetujuan. Apa langkah pertama?",options:["Abaikan karena belum ada komplain","Sebarkan kejadian dalam grup publik","Amankan bukti, eskalasi insiden, nilai dampak dan lakukan containment","Hapus semua log tanpa dokumentasi"],correct:2,explanation:"Tindakan awal: amankan bukti, kendalikan paparan, lakukan penilaian dampak dan eskalasi sesuai prosedur insiden."}
+    ];
+    const safe=(v)=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    function button(label,action,cls=""){return '<button class="button '+cls+'" onclick="'+action+'">'+label+"</button>"}
+    function paint(markup){app.innerHTML=markup}
+    function errorText(e){return safe(e?.message||String(e||"Terjadi kesalahan"))}
+    function notify(message,isError=false){const el=document.getElementById("feedback");if(el)el.innerHTML='<div class="notice '+(isError?"error":"")+'">'+safe(message)+"</div>"}
+    function home(){
+      presenter=false;stopListening();
+      const code=new URL(location.href).searchParams.get("code")||localStorage.getItem("lab_join_code")||"";
+      paint('<section class="hero"><div class="eyebrow">Live interactive learning</div><h1>Belajar AI Governance melalui keputusan nyata.</h1><p>Polling langsung, kuis, simulasi keputusan, dan respons insiden. Gabung dari HP atau kendalikan aktivitas sebagai presenter.</p></section>'+
+        '<div class="grid"><section class="card"><div class="eyebrow">Untuk peserta</div><h2>Gabung ke sesi</h2><form id="joinForm"><label for="joinCode">Kode sesi (6 angka)</label><input id="joinCode" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" value="'+safe(code)+'" placeholder="Contoh: 482913" required />'+
+        '<label for="joinName">Nama samaran</label><input id="joinName" maxlength="30" minlength="2" placeholder="Contoh: Tim Risk 1" required /><button type="submit" class="button primary block">Gabung Sekarang</button></form></section>'+
+        '<section class="card"><div class="eyebrow">Untuk fasilitator</div><h2>Presenter Mode</h2><p>Buat sesi pelatihan, buka pertanyaan, lihat hasil real-time, dan tampilkan leaderboard.</p>'+button("Masuk sebagai presenter","lab.presenterLogin()","dark block")+'</section></div><div id="feedback"></div>');
+      document.getElementById("joinForm").onsubmit=(ev)=>{ev.preventDefault();join()};
+    }
+    function presenterLogin(){
+      presenter=true;stopListening();
+      paint('<div class="card" style="max-width:500px;margin:auto"><div class="eyebrow">Presenter only</div><h2>Masuk ke Presenter Mode</h2><p>Gunakan akun presenter Supabase Auth. Peserta tidak perlu email atau password.</p>'+
+        '<form id="loginForm"><label>Email</label><input id="loginEmail" type="email" required autocomplete="username" /><label>Password</label><input id="loginPassword" type="password" minlength="6" required autocomplete="current-password" />'+
+        '<button class="button primary block" type="submit">Masuk</button></form><div class="actions">'+button("Daftar presenter","lab.presenterSignup()")+button("Kembali","lab.home()")+'</div><div id="feedback"></div></div>');
+      document.getElementById("loginForm").onsubmit=async(ev)=>{ev.preventDefault();const {data,error}=await db.auth.signInWithPassword({email:document.getElementById("loginEmail").value,password:document.getElementById("loginPassword").value});if(error){notify(errorText(error),true);return}currentUser=data.user;presenterDashboard()};
+    }
+    function presenterSignup(){
+      paint('<div class="card" style="max-width:500px;margin:auto"><h2>Buat akun presenter</h2><p>Daftar menggunakan email. Anda mungkin perlu memverifikasi email sebelum masuk.</p><form id="signupForm"><label>Email</label><input id="signupEmail" type="email" required /><label>Password (minimal 8 karakter)</label><input id="signupPass" type="password" minlength="8" required /><button class="button primary block" type="submit">Daftar</button></form><div class="actions">'+button("Kembali ke login","lab.presenterLogin()")+'</div><div id="feedback"></div></div>');
+      document.getElementById("signupForm").onsubmit=async(ev)=>{ev.preventDefault();const {data,error}=await db.auth.signUp({email:document.getElementById("signupEmail").value,password:document.getElementById("signupPass").value});if(error){notify(errorText(error),true);return}currentUser=data.user;notify("Pendaftaran diterima. Periksa email verifikasi jika diminta, kemudian masuk sebagai presenter.")};
+    }
+    async function presenterDashboard(){
+      presenter=true;stopListening();const {data:userResult}=await db.auth.getUser();currentUser=userResult.user;
+      if(!currentUser||currentUser.is_anonymous){presenterLogin();return}
+      const {data,error}=await db.from("lab_sessions").select("id,code,title,state,created_at").eq("owner_id",currentUser.id).order("created_at",{ascending:false});
+      if(error){paint('<div class="notice error">'+errorText(error)+"</div>");return}
+      paint('<div class="toprow"><div><div class="eyebrow">Presenter Mode</div><h1>Kelola sesi pelatihan</h1></div>'+button("Keluar","lab.logout()")+'</div><div class="card"><h2>Mulai aktivitas interaktif</h2><p>Empat modul sudah disiapkan. Setiap sesi mendapatkan kode dan QR untuk peserta.</p>'+button("Buat Sesi Baru","lab.createRoom()","primary")+'</div><div class="section-gap"><h2>Sesi yang tersedia</h2>'+((data||[]).length?'<div class="grid">'+data.map(s=>'<div class="card"><div class="meta">'+safe(s.state.toUpperCase())+'</div><h3>'+safe(s.title)+'</h3><div class="bigcode" style="font-size:27px">'+safe(s.code)+'</div>'+button("Buka Presenter","lab.openRoom(\''+safe(s.id)+'\')',"primary block")+'</div>').join("")+'</div>':'<div class="empty">Belum ada sesi. Klik Buat Sesi Baru.</div>')+'</div><div id="feedback"></div>');
+    }
+    async function createRoom(){
+      if(busy)return;busy=true;
+      try{
+        const {data:u}=await db.auth.getUser();currentUser=u.user;
+        if(!currentUser||currentUser.is_anonymous)throw Error("Anda harus masuk dengan akun presenter.");
+        const code=String(Math.floor(100000+Math.random()*900000));
+        const {data:s,error:se}=await db.from("lab_sessions").insert({code,owner_id:currentUser.id,title:"AI Governance Live Lab"}).select().single();if(se)throw se;
+        const payload=demo.map((q,i)=>({session_id:s.id,position:i+1,type:q.type,title:q.title,prompt:q.prompt,options:q.options,status:"draft"}));
+        const {data:acts,error:ae}=await db.from("lab_activities").insert(payload).select();if(ae)throw ae;
+        const keys=acts.filter(a=>a.type!=="poll").map(a=>({activity_id:a.id,correct_index:demo[a.position-1].correct,explanation:demo[a.position-1].explanation}));
+        const {error:ke}=await db.from("lab_answer_keys").insert(keys);if(ke)throw ke;
+        await openRoom(s.id);
+      }catch(e){notify("Gagal membuat sesi: "+errorText(e),true)}finally{busy=false}
+    }
+    function stopListening(){if(channel){db.removeChannel(channel);channel=null}if(heartbeat){clearInterval(heartbeat);heartbeat=null}}
+    async function startListening(sessionId){
+      stopListening();
+      channel=db.channel("lab-room-"+sessionId)
+        .on("postgres_changes",{event:"*",schema:"public",table:"lab_sessions",filter:"id=eq."+sessionId},()=>refreshRoom(false))
+        .on("postgres_changes",{event:"*",schema:"public",table:"lab_activities",filter:"session_id=eq."+sessionId},()=>refreshRoom(false))
+        .on("postgres_changes",{event:"INSERT",schema:"public",table:"lab_responses"},()=>{if(presenter)refreshRoom(false)})
+        .subscribe();
+      heartbeat=setInterval(()=>refreshRoom(false),5000);
+    }
+    async function openRoom(id){
+      presenter=true;room={id};choiceSubmitted=null;
+      await refreshRoom(true);
+      await startListening(id);
+    }
+    async function refreshRoom(first=false){
+      if(!room)return;
+      const rid=room.id;
+      const {data:s,error}=await db.from("lab_sessions").select("*").eq("id",rid).single();
+      if(error||!s){if(first)paint('<div class="notice error">Tidak dapat membuka sesi: '+errorText(error)+'</div>');return}
+      room=s;
+      if(presenter){
+        const r=await Promise.all([
+          db.from("lab_activities").select("*").eq("session_id",rid).order("position"),
+          db.from("lab_participants").select("*").eq("session_id",rid),
+          db.from("lab_answer_keys").select("*"),
+          db.from("lab_responses").select("*")
+        ]);
+        for(const x of r){if(x.error){notify("Gagal memuat hasil: "+errorText(x.error),true);return}}
+        items=r[0].data||[];participants=r[1].data||[];answerKeys=r[2].data||[];
+        const actIds=new Set(items.map(x=>x.id));responses=(r[3].data||[]).filter(x=>actIds.has(x.activity_id));
+        renderPresenter();
+      }else{
+        let active=null;
+        if(s.active_activity_id){
+          const {data:a}=await db.from("lab_activities").select("*").eq("id",s.active_activity_id).maybeSingle();
+          active=a;
+        }
+        items=active?[active]:[];
+        if(active){
+          const {data:mine}=await db.from("lab_responses").select("id,option_index,points").eq("activity_id",active.id).limit(1);
+          choiceSubmitted=mine?.[0]||null;
+        }else choiceSubmitted=null;
+        renderParticipant();
+      }
+    }
+    function activityStats(a){
+      const mine=responses.filter(r=>r.activity_id===a.id);
+      const counts=a.options.map((_,i)=>mine.filter(r=>r.option_index===i).length);
+      const total=mine.length;
+      return '<div class="result-row"><div class="meta">'+total+" jawaban masuk</div></div>"+
+        a.options.map((o,i)=>'<div class="result-row"><div class="barlabel"><span>'+safe(o)+'</span><b>'+counts[i]+' ('+(total?Math.round(counts[i]*100/total):0)+'%)</b></div><div class="bar-bg"><div class="bar" style="width:'+(total?counts[i]*100/total:0)+'%"></div></div></div>').join("");
+    }
+    function leaderboard(){
+      const scores=participants.map(p=>({name:p.nickname,score:responses.filter(r=>r.participant_id===p.id).reduce((n,r)=>n+r.points,0)})).sort((a,b)=>b.score-a.score).slice(0,10);
+      return '<table><thead><tr><th>Posisi</th><th>Peserta</th><th>Skor</th></tr></thead><tbody>'+scores.map((p,i)=>'<tr><td>'+(i+1)+'</td><td>'+safe(p.name)+'</td><td>'+p.score+'</td></tr>').join("")+'</tbody></table>';
+    }
+    function renderPresenter(){
+      const active=items.find(a=>a.id===room.active_activity_id);
+      const joinUrl=location.origin+location.pathname+"?code="+encodeURIComponent(room.code);
+      paint('<div class="toprow"><div><div class="eyebrow">Presenter Mode</div><h1>'+safe(room.title)+'</h1></div><div class="actions">'+button("Daftar sesi","lab.presenterDashboard()")+button("Unduh CSV","lab.exportCSV()")+'</div></div>'+
+        '<section class="card"><div class="toprow"><div><div class="small">Kode bergabung</div><div class="bigcode">'+safe(room.code)+'</div><div class="meta">'+safe(joinUrl)+'</div></div><div id="qr"></div></div><div class="mini-stats section-gap"><div><div class="number">'+participants.length+'</div><div class="small">Peserta</div></div><div><div class="number">'+responses.length+'</div><div class="small">Total jawaban</div></div><div><span class="pill '+(room.state==="live"?"green":"")+'">'+safe(room.state)+'</span></div></div></section>'+
+        '<div class="cols section-gap"><section class="card"><h2>Rundown interaktif</h2><p>Pilih satu modul, lalu tampilkan hasil di layar.</p><div class="questions">'+items.map(a=>'<div class="question-row"><div><b>'+a.position+'. '+safe(a.title)+'</b><div class="small">'+safe(a.status)+'</div></div>'+button(a.status==="open"?"Sedang berjalan":a.status==="revealed"?"Ulangi":"Mulai","lab.activate(\''+a.id+'\')",a.id===room.active_activity_id?"primary":"")+'</div>').join("")+'</div>'+button("Akhiri sesi","lab.endRoom()","warn")+'</section>'+
+        '<section class="card"><h2>'+(active?safe(active.title):"Hasil langsung")+'</h2>'+(active?'<p>'+safe(active.prompt)+'</p>'+activityStats(active)+
+          (active.type!=="poll"?'<div class="notice">'+safe(answerKeys.find(k=>k.activity_id===active.id)?.explanation||"")+'</div>':"")+
+          '<div class="actions">'+(active.status==="open"?button("Tutup voting & tampilkan hasil","lab.reveal()","primary"):button("Buka voting kembali","lab.activate(\''+active.id+'\')"))+'</div>'
+          :'<div class="empty">Mulai salah satu aktivitas di sebelah kiri.</div>')+'</section></div>'+
+        '<section class="card section-gap"><div class="toprow"><h2>Leaderboard</h2><span class="meta">Nama samaran</span></div>'+leaderboard()+'</section><div id="feedback"></div>');
+      const qr=document.getElementById("qr");
+      if(window.QRCode){qr.replaceChildren();new window.QRCode(qr,{text:joinUrl,width:120,height:120,correctLevel:window.QRCode.CorrectLevel.M})}
+      else qr.textContent="QR memerlukan koneksi CDN. Bagikan kode sesi.";
+    }
+    async function activate(id){
+      if(!room||!presenter)return;
+      try{
+        const previous=items.find(a=>a.id===room.active_activity_id);
+        if(previous&&previous.id!==id){const {error}=await db.from("lab_activities").update({status:"closed"}).eq("id",previous.id);if(error)throw error}
+        const {error:a}=await db.from("lab_activities").update({status:"open"}).eq("id",id);if(a)throw a;
+        const {error:s}=await db.from("lab_sessions").update({active_activity_id:id,state:"live"}).eq("id",room.id);if(s)throw s;
+        await refreshRoom(false);
+      }catch(e){notify(errorText(e),true)}
+    }
+    async function reveal(){
+      if(!room?.active_activity_id)return;
+      const {error}=await db.from("lab_activities").update({status:"revealed"}).eq("id",room.active_activity_id);
+      if(error)notify(errorText(error),true);else await refreshRoom();
+    }
+    async function endRoom(){
+      if(!room||!confirm("Akhiri sesi ini? Peserta tidak dapat bergabung lagi."))return;
+      const {error}=await db.from("lab_sessions").update({state:"ended"}).eq("id",room.id);
+      if(error)notify(errorText(error),true);else await presenterDashboard();
+    }
+    async function ensureParticipant(){
+      const {data:existing}=await db.auth.getUser();
+      if(existing?.user){currentUser=existing.user;return}
+      const {data,error}=await db.auth.signInAnonymously();
+      if(error)throw new Error("Anonymous Sign-Ins perlu diaktifkan di Supabase Auth. Detail: "+error.message);
+      currentUser=data.user;
+    }
+    async function join(){
+      if(busy)return;busy=true;
+      const code=document.getElementById("joinCode").value.trim();
+      const nickname=document.getElementById("joinName").value.trim();
+      try{
+        if(!/^[0-9]{6}$/.test(code))throw Error("Kode sesi harus enam angka.");
+        await ensureParticipant();
+        const {data,error}=await db.rpc("lab_join",{p_code:code,p_nickname:nickname});
+        if(error)throw error;
+        presenter=false;room={id:data};localStorage.setItem("lab_join_code",code);
+        await refreshRoom(true);
+        await startListening(data);
+      }catch(e){notify(errorText(e),true)}finally{busy=false}
+    }
+    function renderParticipant(){
+      const active=items[0];
+      let body="";
+      if(room.state==="ended")body='<div class="notice">Sesi telah berakhir. Terima kasih sudah berpartisipasi.</div>';
+      else if(!active)body='<div class="empty"><h2>Menunggu presenter</h2><p>Pertanyaan akan muncul otomatis setelah sesi dimulai.</p></div>';
+      else if(active.status!=="open")body='<div class="notice">Jawaban untuk aktivitas ini telah ditutup. Lihat hasil pada layar presenter.</div>';
+      else if(choiceSubmitted)body='<div class="notice">Jawaban tercatat.'+(active.type!=="poll"?" Skor aktivitas ini: "+choiceSubmitted.points+".":"")+' Tunggu aktivitas berikutnya.</div>';
+      else body='<div class="eyebrow">'+safe(active.type)+'</div><h2>'+safe(active.title)+'</h2><p>'+safe(active.prompt)+'</p>'+
+        active.options.map((o,i)=>'<button class="option" onclick="lab.submit(\''+active.id+'\','+i+')"><span style="color:#4d70aa;font-weight:700;margin-right:12px">'+String.fromCharCode(65+i)+'.</span>'+safe(o)+'</button>').join("");
+      paint('<div class="toprow"><div><div class="eyebrow">Participant Mode</div><h1>'+safe(room.title)+'</h1><span class="pill '+(room.state==="live"?"green":"")+'">'+safe(room.state)+'</span></div>'+button("Keluar","lab.home()")+'</div>'+
+        '<div class="card section-gap">'+body+'</div><p class="small">Pertanyaan akan berganti otomatis mengikuti presenter. Gunakan nama samaran, jangan masukkan data pribadi atau data nasabah.</p><div id="feedback"></div>');
+    }
+    async function submit(id,index){
+      if(busy||choiceSubmitted)return;busy=true;
+      try{const {data,error}=await db.rpc("lab_submit",{p_activity:id,p_choice:index});if(error)throw error;if(!data?.accepted){notify("Anda sudah menjawab pertanyaan ini.",true)}await refreshRoom()}catch(e){notify(errorText(e),true)}finally{busy=false}
+    }
+    function exportCSV(){
+      if(!presenter)return;
+      const headers=["Participant","Module","Selected option","Points"];
+      const rows=responses.map(r=>{const p=participants.find(x=>x.id===r.participant_id);const a=items.find(x=>x.id===r.activity_id);return [p?.nickname||"Unknown",a?.title||"",a?.options?.[r.option_index]||"",r.points]});
+      const esc=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+      const csv="\ufeff"+[headers,...rows].map(x=>x.map(esc).join(",")).join("\r\n");
+      const u=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8;"}));
+      const a=document.createElement("a");a.href=u;a.download="ai-governance-live-lab-"+(room?.code||"session")+".csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);
+    }
+    async function logout(){await db.auth.signOut();currentUser=null;room=null;home()}
+    window.lab={home,presenterLogin,presenterSignup,presenterDashboard,createRoom,openRoom,activate,reveal,endRoom,submit,exportCSV,logout};
+    const {data:userData}=await db.auth.getUser();currentUser=userData?.user||null;
+    home();
+  </script>
+</body>
+</html>
