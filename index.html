@@ -118,11 +118,33 @@
       document.getElementById("signupForm").onsubmit=async(ev)=>{ev.preventDefault();const {data,error}=await db.auth.signUp({email:document.getElementById("signupEmail").value,password:document.getElementById("signupPass").value});if(error){notify(errorText(error),true);return}currentUser=data.user;notify("Pendaftaran diterima. Periksa email verifikasi jika diminta, kemudian masuk sebagai presenter.")};
     }
     async function presenterDashboard(){
-      presenter=true;stopListening();const {data:userResult}=await db.auth.getUser();currentUser=userResult.user;
+      presenter=true;
+      stopListening();
+      const {data:userResult}=await db.auth.getUser();
+      currentUser=userResult.user;
       if(!currentUser||currentUser.is_anonymous){presenterLogin();return}
-      const {data,error}=await db.from("lab_sessions").select("id,code,title,state,created_at").eq("owner_id",currentUser.id).order("created_at",{ascending:false});
-      if(error){paint('<div class="notice error">'+errorText(error)+"</div>");return}
-      paint('<div class="toprow"><div><div class="eyebrow">Presenter Mode</div><h1>Kelola sesi pelatihan</h1></div>'+button("Keluar","lab.logout()")+'</div><div class="card"><h2>Mulai aktivitas interaktif</h2><p>Empat modul sudah disiapkan. Setiap sesi mendapatkan kode dan QR untuk peserta.</p>'+button("Buat Sesi Baru","lab.createRoom()","primary")+'</div><div class="section-gap"><h2>Sesi yang tersedia</h2>'+((data||[]).length?'<div class="grid">'+data.map(s=>'<div class="card"><div class="meta">'+safe(s.state.toUpperCase())+'</div><h3>'+safe(s.title)+'</h3><div class="bigcode" style="font-size:27px">'+safe(s.code)+'</div>'+button("Buka Presenter","lab.openRoom(\''+safe(s.id)+'\')',"primary block")+'</div>').join("")+'</div>':'<div class="empty">Belum ada sesi. Klik Buat Sesi Baru.</div>')+'</div><div id="feedback"></div>');
+      const result=await db.from("lab_sessions")
+        .select("id,code,title,state,created_at")
+        .eq("owner_id",currentUser.id)
+        .order("created_at",{ascending:false});
+      if(result.error){paint('<div class="notice error">'+errorText(result.error)+'</div>');return}
+      const rooms=result.data||[];
+      let list='<div class="empty">Belum ada sesi. Klik Buat Sesi Baru.</div>';
+      if(rooms.length){
+        const cards=rooms.map(s=>{
+          const openAction="lab.openRoom('"+s.id+"')";
+          return '<div class="card"><div class="meta">'+safe(s.state.toUpperCase())+'</div>'+
+            '<h3>'+safe(s.title)+'</h3><div class="bigcode" style="font-size:27px">'+safe(s.code)+'</div>'+
+            button("Buka Presenter",openAction,"primary block")+'</div>';
+        }).join("");
+        list='<div class="grid">'+cards+'</div>';
+      }
+      const head='<div class="toprow"><div><div class="eyebrow">Presenter Mode</div>'+
+        '<h1>Kelola sesi pelatihan</h1></div>'+button("Keluar","lab.logout()")+'</div>';
+      const create='<div class="card"><h2>Mulai aktivitas interaktif</h2>'+
+        '<p>Empat modul sudah disiapkan. Setiap sesi mendapatkan kode dan QR untuk peserta.</p>'+
+        button("Buat Sesi Baru","lab.createRoom()","primary")+'</div>';
+      paint(head+create+'<div class="section-gap"><h2>Sesi yang tersedia</h2>'+list+'</div><div id="feedback"></div>');
     }
     async function createRoom(){
       if(busy)return;busy=true;
